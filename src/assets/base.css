@@ -1,0 +1,153 @@
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-indigo: #2c3e50;
+
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --vt-c-layout-border-color: lightgray;
+  --vt-c-layout-header-background: linear-gradient(90deg,#1d42ab,#2173dc,#1e93ff);
+  --vt-c-layout-content-background: #f5f7f9;
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --section-gap: 160px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-heading: var(--vt-c-text-dark-1);
+    --color-text: var(--vt-c-text-dark-2);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--vt-c-layout-content-background);
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.6;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.search-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-table .el-breadcrumb {
+  background: #fff;
+  height: 40px;
+  font-size: medium;
+  font-weight: 700;
+  padding: 10px;
+}
+
+.search-area {
+  height: 56px;
+  display: flex;
+  gap: 10px;
+  padding: 10px 22px 10px 15px;
+  background: #fff;
+  margin: 10px;
+  border-radius: 4px;
+}
+
+.search-area .search-input {
+  width: 180px;
+  min-width: 180px;
+  height: 32px;
+}
+
+.search-content {
+  height: calc(100% - 136px);
+  margin: 0 10px 10px 10px;
+  border-radius: 4px;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.search-content::-webkit-scrollbar {
+  display: none;
+}
+
+.search-table .expand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f4edee;
+  padding: 10px;
+  color: #999092;
+}
+
+.search-table .expand-info .imgs {
+  display: flex;
+  gap: 30px;
+  justify-content: start;
+}
+
+.search-table .expand-info .imgs .item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.search-table .el-table__expanded-cell[class*=cell] {
+  padding: 0 !important;
+}
+
+.search-table .el-divider__text {
+  background-color: #f4edee !important;
+  color: #999092 !important;
+}
+
+.search-table .el-divider--horizontal {
+  border-top: 1px #999092 solid !important;
+}
