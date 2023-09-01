@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <template>
     <CustomDialog :width="dialogWidth" v-loading="isLoading" ref="dialogRef" title="新增点位" @on-close="clearData"
         @on-submit="handleSubmit">
@@ -30,7 +31,12 @@
                 <el-input v-model="addData.modelUrl" readonly @click="() => openUploaddialog('modelUrl')" />
             </el-form-item>
             <el-form-item label="识别图：" prop="identityImgUrl">
-                <el-input v-model="addData.identityImgUrl" readonly @click="() => openUploaddialog('identityImgUrl')" />
+                <el-input v-for="(item, index) in addData.identityImgUrl" :key="index" :value="item" readonly :style="{marginBottom: '6px'}">
+                    <template #append>
+                        <el-button :icon="Delete" @click="deleteIdentityImgs(index)"/>
+                    </template>
+                </el-input>
+                <el-button @click="() => openUploaddialog('identityImgUrl')">上传识别图</el-button>
             </el-form-item>
             <el-form-item label="幸运签图：" prop="luckyImgUrl">
                 <el-input v-model="addData.luckyImgUrl" readonly @click="() => openUploaddialog('luckyImgUrl')" />
@@ -50,6 +56,7 @@ import { reactive, ref, watch } from 'vue';
 import { createArPoint, updateArPoint } from '@/apis/ar-point'
 import type { FormInstance, FormRules } from 'element-plus'
 import CustomUpload from '@/components/CustomUpload.vue';
+import { Delete } from '@element-plus/icons-vue'
 
 type DialogCtx = InstanceType<typeof CustomDialog>
 type UploadDialogCtx = InstanceType<typeof CustomUpload>
@@ -62,7 +69,7 @@ interface AddArPointRule {
     sequenceNum: number,
     modelScale: number,
     modelUrl: string,
-    identityImgUrl: string
+    identityImgUrl: Array<string>
     luckyImgUrl: string
     scanThumbnailUrl: string
 }
@@ -83,7 +90,7 @@ const editMode = ref(false)
 const dialogWidth = ref("600px")
 
 const addData = reactive<AddArPointRule>({
-    title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: '', luckyImgUrl: '', scanThumbnailUrl: ''
+    id: 0, title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: [], luckyImgUrl: '', scanThumbnailUrl: ''
 })
 
 const addRules = reactive<FormRules<AddArPointRule>>({
@@ -102,11 +109,12 @@ const typeDesc = ref("触发识别")
 const sequenceNumDesc = ref("一")
 
 const clearData = () => {
+    console.log(111111111)
     addData.id = 0
     addData.title = ""
     addData.description = ""
     addData.modelUrl = ""
-    addData.identityImgUrl = ""
+    addData.identityImgUrl = []
     addData.scanThumbnailUrl = ""
     addData.luckyImgUrl = ""
     addData.type = 1
@@ -120,7 +128,12 @@ const open = () => {
     dialogRef.value?.open()
 }
 
+const deleteIdentityImgs = (i: number) => {
+    addData.identityImgUrl.splice(i, 1)
+}
+
 const openForEdit = (data: any) => {
+    console.log(2222, data)
     editMode.value = true
     addData.id = data.id
     addData.title = data.title
@@ -139,11 +152,20 @@ const openForEdit = (data: any) => {
 
 const openUploaddialog = (props: string) => {
     uploadProps = props
-    uploadDialogRef.value?.open(addData[uploadProps])
+    if (props === "identityImgUrl") {
+        uploadDialogRef.value?.open("")
+    } else {
+        uploadDialogRef.value?.open(addData[uploadProps])
+    }
+
 }
 
 const handleUploadOk = (link: string) => {
-    addData[uploadProps] = link
+    if (uploadProps === "identityImgUrl") {
+        addData.identityImgUrl.push(link)
+    } else {
+        addData[uploadProps] = link
+    }
 }
 
 const handleClose = () => {
@@ -151,7 +173,7 @@ const handleClose = () => {
 }
 
 const handleSubmit = () => {
-    formRef.value.validate((valid: any, fields: any) => {
+    formRef.value?.validate((valid: any, fields: any) => {
         if (valid) {
             if (editMode.value) {
                 updateArPoint(addData).then(() => {

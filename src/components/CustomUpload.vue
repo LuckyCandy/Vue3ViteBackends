@@ -42,7 +42,6 @@ const uploadFile = ref<any>(null)
 let emits = defineEmits(['upload-ok'])
 
 const handleFileChoose = (event: any) => {
-    debugger;;
     uploadFile.value = event.target.files[0]
     fileName.value = uploadFile.value.name
     if (uploadFile.value.type == 'image/png' || uploadFile.value.type == 'image/jpeg') {

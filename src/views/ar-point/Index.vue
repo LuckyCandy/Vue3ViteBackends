@@ -2,6 +2,8 @@
 import { onMounted, ref } from 'vue'
 import ArPointAdd from './components/ArPointAdd.vue'
 import { fetchArPointList } from '@/apis/ar-point'
+import {clone} from '@/utils'
+
 
 type ArPointModelCtx = InstanceType<typeof ArPointAdd>
 
@@ -31,8 +33,8 @@ const clickRowHandle = (row: any, column: any, event: any) => {
   }
 }
 
-const editRow = (data: any) => {
-  arPointModelCtx.value?.openForEdit(data)
+const editRow = (data: number) => {
+  arPointModelCtx.value?.openForEdit(clone(tableData.value[data]))
 }
 
 
@@ -64,9 +66,9 @@ onMounted(searchData)
           <template #default="scope">
             <div class="expand-info">
               <div class="imgs">
-                <div class="item">
-                  <el-image style="height: 200px" :src="scope.row.identityImgUrl" fit="contain" lazy />
-                  <el-divider>识别图</el-divider>
+                <div class="item" v-for="(item, index) in scope.row.identityImgUrl" :key="index">
+                  <el-image style="height: 200px" :src="item" fit="contain" lazy />
+                  <el-divider>识别图({{ index+1 }})</el-divider>
                 </div>
                 <div class="item">
                   <el-image style="height: 200px" :src="scope.row.luckyImgUrl" fit="contain" lazy />
@@ -114,7 +116,7 @@ onMounted(searchData)
         <el-table-column prop="updateTime" label="更新时间" width="200" align="center"/>
         <el-table-column fixed="right" label="操作" width="80" align="center">
           <template #default="scope">
-            <el-button type="danger" size="small" :style="{ fontWeight: 'bold' }" @click.native.stop="editRow(scope.row)">编辑</el-button>
+            <el-button type="danger" size="small" :style="{ fontWeight: 'bold' }" @click.native.stop="editRow(scope.$index)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
