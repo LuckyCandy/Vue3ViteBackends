@@ -25,3 +25,7 @@ export const updateArPoint = (data: any) => {
     return request.post<any>('/api/b/ar-point/update', data)
 }
 
+export const removeArPoint = (id: number) => {
+    return request.get<any>('/api/b/ar-point/delete?id='+id)
+}
+

@@ -19,7 +19,12 @@ const router = createRouter({
           path: '/sys/ar-point',
           name: 'ar-point',
           component: () => import('../views/ar-point/Index.vue')
-        }
+        },
+        {
+          path: '/sys/sticker',
+          name: 'sticker',
+          component: () => import('../views/sticker/Index.vue')
+        },
       ]
     },
     { path: "/", redirect: "/sys/user" },

@@ -17,7 +17,6 @@ const searchData = () => {
 }
 
 const doResetPassword = (item: any) => {
-  console.log(1111, item)
   ElMessageBox.prompt(`正在修改${item.name}的密码`, '注意', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',

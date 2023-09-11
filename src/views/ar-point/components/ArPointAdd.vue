@@ -2,7 +2,7 @@
 <template>
     <CustomDialog :width="dialogWidth" v-loading="isLoading" ref="dialogRef" title="新增点位" @on-close="clearData"
         @on-submit="handleSubmit">
-        <el-form :model="addData" label-width="110px" ref="formRef" :rules="addRules">
+        <el-form :model="addData" label-width="140px" ref="formRef" :rules="addRules">
             <el-form-item label="名称：" prop="title">
                 <el-input v-model="addData.title" :style="inputStyle" />
             </el-form-item>
@@ -22,6 +22,7 @@
                     <el-radio-button label="三" />
                     <el-radio-button label="四" />
                     <el-radio-button label="五" />
+                    <el-radio-button label="六" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="模型缩放比：" prop="modelScale">
@@ -40,6 +41,11 @@
             </el-form-item>
             <el-form-item label="幸运签图：" prop="luckyImgUrl">
                 <el-input v-model="addData.luckyImgUrl" readonly @click="() => openUploaddialog('luckyImgUrl')" />
+            </el-form-item>
+            <el-form-item label="幸运签背景渐变：" prop="luckyImgGradient">
+                <el-color-picker v-model="addData.luckyImgGradientStart" @change="() => addData.luckyImgGradient[0] = addData.luckyImgGradientStart" />
+                    <span style="margin: 0 10px; font-weight: bold;">渐变至</span>
+                <el-color-picker v-model="addData.luckyImgGradientEnd" @change="() => addData.luckyImgGradient[1] = addData.luckyImgGradientEnd" />
             </el-form-item>
             <el-form-item label="扫描缩略图：" prop="scanThumbnailUrl">
                 <el-input v-model="addData.scanThumbnailUrl" readonly @click="() => openUploaddialog('scanThumbnailUrl')" />
@@ -65,12 +71,15 @@ interface AddArPointRule {
     id: number
     title: string
     description: string
-    type: number,
-    sequenceNum: number,
-    modelScale: number,
-    modelUrl: string,
+    type: number
+    sequenceNum: number
+    modelScale: number
+    modelUrl: string
     identityImgUrl: Array<string>
     luckyImgUrl: string
+    luckyImgGradient: Array<string>
+    luckyImgGradientStart: string
+    luckyImgGradientEnd: string
     scanThumbnailUrl: string
 }
 
@@ -81,7 +90,7 @@ const typeMap = {
     "触发识别": 1, "跟踪识别": 2
 }
 const sequenceNumMap = {
-    "一": 1, "二": 2, "三": 3, "四": 4, "五": 5
+    "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6
 }
 const inputStyle = {
     fontSize: '18px', letterSpace: '1px'
@@ -90,7 +99,7 @@ const editMode = ref(false)
 const dialogWidth = ref("600px")
 
 const addData = reactive<AddArPointRule>({
-    id: 0, title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: [], luckyImgUrl: '', scanThumbnailUrl: ''
+    id: 0, title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: [], luckyImgUrl: '', scanThumbnailUrl: '', luckyImgGradientStart: '', luckyImgGradientEnd: '', luckyImgGradient: []
 })
 
 const addRules = reactive<FormRules<AddArPointRule>>({
@@ -100,6 +109,7 @@ const addRules = reactive<FormRules<AddArPointRule>>({
     identityImgUrl: [{ required: true, message: '请上传识别图！', trigger: 'change' }],
     scanThumbnailUrl: [{ required: true, message: '请上传扫描缩略图！', trigger: 'change' }],
     luckyImgUrl: [{ required: true, message: '请上传幸运签图！', trigger: 'change' }],
+    luckyImgGradient: [{ required: true, message: '请上传幸运签背景渐变！', trigger: 'change' }],
 })
 
 const formRef = ref<FormInstance>()
@@ -109,7 +119,6 @@ const typeDesc = ref("触发识别")
 const sequenceNumDesc = ref("一")
 
 const clearData = () => {
-    console.log(111111111)
     addData.id = 0
     addData.title = ""
     addData.description = ""
@@ -120,6 +129,9 @@ const clearData = () => {
     addData.type = 1
     addData.sequenceNum = 1
     addData.modelScale = 100
+    addData.luckyImgGradientStart = ''
+    addData.luckyImgGradientEnd = ''
+    addData.luckyImgGradient = []
 }
 
 const isLoading = ref(false)
@@ -133,7 +145,6 @@ const deleteIdentityImgs = (i: number) => {
 }
 
 const openForEdit = (data: any) => {
-    console.log(2222, data)
     editMode.value = true
     addData.id = data.id
     addData.title = data.title
@@ -145,8 +156,11 @@ const openForEdit = (data: any) => {
     addData.type = data.type
     typeDesc.value = addData.type == 1 ? "触发识别" : "跟踪识别"
     addData.sequenceNum = data.sequenceNum
-    sequenceNumDesc.value = addData.sequenceNum == 1 ? "一" : (addData.sequenceNum == 2 ? "二" : (addData.sequenceNum == 3 ? "三" : (addData.sequenceNum == 4 ? "四" : "五")))
+    sequenceNumDesc.value = addData.sequenceNum == 1 ? "一" : (addData.sequenceNum == 2 ? "二" : (addData.sequenceNum == 3 ? "三" : (addData.sequenceNum == 4 ? "四" : (addData.sequenceNum == 5 ? "五" : "六"))))
     addData.modelScale = data.modelScale
+    addData.luckyImgGradientStart = data.luckyImgGradient[0]
+    addData.luckyImgGradientEnd = data.luckyImgGradient[1]
+    addData.luckyImgGradient = [data.luckyImgGradient[0], data.luckyImgGradient[1]]
     dialogRef.value?.open()
 }
 
@@ -168,9 +182,6 @@ const handleUploadOk = (link: string) => {
     }
 }
 
-const handleClose = () => {
-    clearData()
-}
 
 const handleSubmit = () => {
     formRef.value?.validate((valid: any, fields: any) => {
