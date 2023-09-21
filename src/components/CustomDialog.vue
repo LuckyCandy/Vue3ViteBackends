@@ -1,7 +1,7 @@
 <!-- 模板部分 -->
 <template>
     <div>
-        <el-dialog :width="width" v-model="isShow" :show-close="false" :close-on-click-modal="false" :append-to-body="true" class="custom-dialog">
+        <el-dialog :width="width" v-model="isShow" :show-close="false" :close-on-click-modal="false" :append-to-body="true" destroy-on-close class="custom-dialog" :before-close="handleClose">
             <!-- 弹窗头部 -->
             <template #header="{ close, titleId, titleClass }">
                 <div class="custom-header">
@@ -61,6 +61,11 @@ const close = () => {
     isShow.value = false;
     isLoading.value = false
     emits('on-close');
+}
+
+const handleClose = (done: () => void) => {
+    close()
+    done()
 }
 
 const open = () => {

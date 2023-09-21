@@ -23,6 +23,7 @@
                     <el-radio-button label="四" />
                     <el-radio-button label="五" />
                     <el-radio-button label="六" />
+                    <el-radio-button label="七" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="模型缩放比：" prop="modelScale">
@@ -32,9 +33,10 @@
                 <el-input v-model="addData.modelUrl" readonly @click="() => openUploaddialog('modelUrl')" />
             </el-form-item>
             <el-form-item label="识别图：" prop="identityImgUrl">
-                <el-input v-for="(item, index) in addData.identityImgUrl" :key="index" :value="item" readonly :style="{marginBottom: '6px'}">
+                <el-input v-for="(item, index) in addData.identityImgUrl" :key="index" :value="item" readonly
+                    :style="{ marginBottom: '6px' }">
                     <template #append>
-                        <el-button :icon="Delete" @click="deleteIdentityImgs(index)"/>
+                        <el-button :icon="Delete" @click="deleteIdentityImgs(index)" />
                     </template>
                 </el-input>
                 <el-button @click="() => openUploaddialog('identityImgUrl')">上传识别图</el-button>
@@ -42,10 +44,16 @@
             <el-form-item label="幸运签图：" prop="luckyImgUrl">
                 <el-input v-model="addData.luckyImgUrl" readonly @click="() => openUploaddialog('luckyImgUrl')" />
             </el-form-item>
-            <el-form-item label="幸运签背景渐变：" prop="luckyImgGradient">
-                <el-color-picker v-model="addData.luckyImgGradientStart" @change="() => addData.luckyImgGradient[0] = addData.luckyImgGradientStart" />
-                    <span style="margin: 0 10px; font-weight: bold;">渐变至</span>
-                <el-color-picker v-model="addData.luckyImgGradientEnd" @change="() => addData.luckyImgGradient[1] = addData.luckyImgGradientEnd" />
+            <el-form-item label="背景音乐：" prop="backSoundUrl">
+                <el-input v-model="addData.backSoundUrl" clearable>
+                    <template #prepend>
+                        <el-button :icon="Upload" @click="() => openUploaddialog('backSoundUrl')"/>
+                    </template>
+                    <template #append v-if="!!addData.backSoundUrl">
+                        <el-button :icon="VideoPlay" v-show="!isPlay" @click="audioPlay"/>
+                        <el-button :icon="VideoPause" v-show="isPlay" @click="audioStop"/>
+                    </template>
+                </el-input>
             </el-form-item>
             <el-form-item label="扫描缩略图：" prop="scanThumbnailUrl">
                 <el-input v-model="addData.scanThumbnailUrl" readonly @click="() => openUploaddialog('scanThumbnailUrl')" />
@@ -62,7 +70,8 @@ import { reactive, ref, watch } from 'vue';
 import { createArPoint, updateArPoint } from '@/apis/ar-point'
 import type { FormInstance, FormRules } from 'element-plus'
 import CustomUpload from '@/components/CustomUpload.vue';
-import { Delete } from '@element-plus/icons-vue'
+import { Delete, Upload, VideoPlay, VideoPause } from '@element-plus/icons-vue'
+
 
 type DialogCtx = InstanceType<typeof CustomDialog>
 type UploadDialogCtx = InstanceType<typeof CustomUpload>
@@ -77,9 +86,7 @@ interface AddArPointRule {
     modelUrl: string
     identityImgUrl: Array<string>
     luckyImgUrl: string
-    luckyImgGradient: Array<string>
-    luckyImgGradientStart: string
-    luckyImgGradientEnd: string
+    backSoundUrl: string
     scanThumbnailUrl: string
 }
 
@@ -90,7 +97,7 @@ const typeMap = {
     "触发识别": 1, "跟踪识别": 2
 }
 const sequenceNumMap = {
-    "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6
+    "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7
 }
 const inputStyle = {
     fontSize: '18px', letterSpace: '1px'
@@ -99,7 +106,7 @@ const editMode = ref(false)
 const dialogWidth = ref("600px")
 
 const addData = reactive<AddArPointRule>({
-    id: 0, title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: [], luckyImgUrl: '', scanThumbnailUrl: '', luckyImgGradientStart: '', luckyImgGradientEnd: '', luckyImgGradient: []
+    id: 0, title: '', description: '', modelUrl: '', type: 1, sequenceNum: 1, modelScale: 100, identityImgUrl: [], luckyImgUrl: '', scanThumbnailUrl: '', backSoundUrl: '',
 })
 
 const addRules = reactive<FormRules<AddArPointRule>>({
@@ -109,7 +116,6 @@ const addRules = reactive<FormRules<AddArPointRule>>({
     identityImgUrl: [{ required: true, message: '请上传识别图！', trigger: 'change' }],
     scanThumbnailUrl: [{ required: true, message: '请上传扫描缩略图！', trigger: 'change' }],
     luckyImgUrl: [{ required: true, message: '请上传幸运签图！', trigger: 'change' }],
-    luckyImgGradient: [{ required: true, message: '请上传幸运签背景渐变！', trigger: 'change' }],
 })
 
 const formRef = ref<FormInstance>()
@@ -117,6 +123,20 @@ const dialogRef = ref<null | DialogCtx>(null)
 const uploadDialogRef = ref<null | UploadDialogCtx>(null)
 const typeDesc = ref("触发识别")
 const sequenceNumDesc = ref("一")
+const audioInstance:HTMLAudioElement = new Audio("")
+const isPlay = ref(false)
+
+const audioPlay = () => {
+    audioInstance.src = addData.backSoundUrl
+    isPlay.value = true
+    audioInstance.loop = true
+    audioInstance.play()
+}
+
+const audioStop = () => {
+    isPlay.value = false
+    audioInstance.pause()
+}
 
 const clearData = () => {
     addData.id = 0
@@ -129,9 +149,8 @@ const clearData = () => {
     addData.type = 1
     addData.sequenceNum = 1
     addData.modelScale = 100
-    addData.luckyImgGradientStart = ''
-    addData.luckyImgGradientEnd = ''
-    addData.luckyImgGradient = []
+    addData.backSoundUrl = ''
+    audioStop()
 }
 
 const isLoading = ref(false)
@@ -156,11 +175,9 @@ const openForEdit = (data: any) => {
     addData.type = data.type
     typeDesc.value = addData.type == 1 ? "触发识别" : "跟踪识别"
     addData.sequenceNum = data.sequenceNum
-    sequenceNumDesc.value = addData.sequenceNum == 1 ? "一" : (addData.sequenceNum == 2 ? "二" : (addData.sequenceNum == 3 ? "三" : (addData.sequenceNum == 4 ? "四" : (addData.sequenceNum == 5 ? "五" : "六"))))
+    sequenceNumDesc.value = addData.sequenceNum == 1 ? "一" : (addData.sequenceNum == 2 ? "二" : (addData.sequenceNum == 3 ? "三" : (addData.sequenceNum == 4 ? "四" : (addData.sequenceNum == 5 ? "五" : (addData.sequenceNum == 6 ? "六" : "七")))))
     addData.modelScale = data.modelScale
-    addData.luckyImgGradientStart = data.luckyImgGradient[0]
-    addData.luckyImgGradientEnd = data.luckyImgGradient[1]
-    addData.luckyImgGradient = [data.luckyImgGradient[0], data.luckyImgGradient[1]]
+    addData.backSoundUrl = data.backSoundUrl
     dialogRef.value?.open()
 }
 

@@ -37,6 +37,11 @@ const editRow = (index: number) => {
   arPointModelCtx.value?.openForEdit(clone(tableData.value[index]))
 }
 
+const showModel = (index: number) => {
+  const url = '/glb-viewer.html?model_link=' + encodeURIComponent(tableData.value[index].modelUrl);
+  window.open(url, '_blank');
+}
+
 const deleteRow = (index: number) => {
 
   ElMessageBox.confirm(
@@ -111,7 +116,8 @@ onMounted(searchData)
               <div>
                 <el-descriptions direction="vertical" :column="2" border>
                   <el-descriptions-item label="点位描述">{{ scope.row.description }}</el-descriptions-item>
-                  <el-descriptions-item label="模型链接">{{ scope.row.modelUrl }}</el-descriptions-item>
+                  <!-- <babylon model="https://static-mkt.linylife.cn/3104e062-c9af-4708-a76c-0fb367f88e6a_tmtuca.glb"></babylon> -->
+                  <!-- <el-descriptions-item label="模型链接">{{ scope.row.modelUrl }}</el-descriptions-item> -->
                 </el-descriptions>
               </div>
             </div>
@@ -143,8 +149,10 @@ onMounted(searchData)
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="200" align="center" />
         <el-table-column prop="updateTime" label="更新时间" width="200" align="center" />
-        <el-table-column fixed="right" label="操作" width="160" align="center">
+        <el-table-column fixed="right" label="操作" width="240" align="center">
           <template #default="scope">
+            <el-button type="info" size="small" :style="{ fontWeight: 'bold' }"
+              @click.native.stop="showModel(scope.$index)">模型预览</el-button>
             <el-button type="primary" size="small" :style="{ fontWeight: 'bold' }"
               @click.native.stop="editRow(scope.$index)">编辑</el-button>
             <el-button type="danger" size="small" :style="{ fontWeight: 'bold' }"

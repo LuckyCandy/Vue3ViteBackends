@@ -43,6 +43,7 @@ let emits = defineEmits(['upload-ok'])
 
 const handleFileChoose = (event: any) => {
     uploadFile.value = event.target.files[0]
+    console.log(uploadFile.value.type)
     fileName.value = uploadFile.value.name
     if (uploadFile.value.type == 'image/png' || uploadFile.value.type == 'image/jpeg') {
         bucket.value = 0
@@ -59,6 +60,7 @@ const clearData = () => {
     uploadFile.value = null
     dialogRef.value?.outterClose()
     bucket.value = 1
+    inputRef.value.value = ''
 }
 
 const handleSubmit = () => {
@@ -83,7 +85,6 @@ const handleSubmit = () => {
 }
 
 const open = (link: string | null) => {
-    console.log('传值：', link)
     if (link && link !== "") {
         fileName.value = link
         if (link.endsWith("png") || link.endsWith("jpg") || link.endsWith("jpeg") || link.endsWith("PNG") || link.endsWith("JPG") || link.endsWith("JPEG")) {

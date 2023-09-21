@@ -32,7 +32,7 @@ onMounted(() => {
       <el-icon>
         <CameraFilled />
       </el-icon>
-      <span>打卡点位</span>
+      <span>贴贴乐</span>
     </el-menu-item>
   </el-menu>
 </template>
